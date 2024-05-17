@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from pathlib import Path
-
+import numpy as np
+import pandas as pd
 import pytest
+import xarray as xr
 
 from aerosol_tools import (
     calculate_aod_cdf_tropopause,
     calculate_aod_local_tropopause,
     calculate_aod_mean_tropopause,
     calculate_aod_per_profile,
-    load_omps_usask,
 )
 
 AOD_PRECISION = 0.0000001
@@ -17,29 +17,37 @@ AOD_PRECISION = 0.0000001
 
 @pytest.fixture()
 def omps_data():
-    ds = load_omps_usask(
-        Path(r"C:\Users\lar555\data\omps\usask\aerosol\v1.3\aerosol\monthly"),
-        min_time="2020-01-01",
-        max_time="2020-02-01",
+
+    time = pd.date_range("2020-01-01 4:00:00", periods=10, freq="10s")
+    alt = np.arange(10.5, 40.5)
+    ext = np.ones((len(time), len(alt)))
+    ext[7, 0:10] = np.nan
+    ext[3, 0:2] = np.nan
+    tropopause = np.linspace(10.5, 15.0, len(time))
+    return xr.Dataset(
+        {
+            "extinction": (["time", "altitude"], ext),
+            "tropopause_altitude": (["time"], tropopause),
+        },
+        coords={"time": time, "altitude": alt},
     )
-    return ds.where((ds.latitude > -10) & (ds.latitude < 10), drop=True)
 
 
 def test_aod_cdf(omps_data):
     aod = calculate_aod_cdf_tropopause(omps_data)
-    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.0061631862
+    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 21.477777777777778
 
 
 def test_aod_mean_trop(omps_data):
     aod = calculate_aod_mean_tropopause(omps_data)
-    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.0056597978
+    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 21.0
 
 
 def test_aod_local_trop(omps_data):
     aod = calculate_aod_local_tropopause(omps_data)
-    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.0079408503
+    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 23.0
 
 
 def test_aod_per_profile(omps_data):
     aod = calculate_aod_per_profile(omps_data)
-    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.0061631862
+    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 20.9

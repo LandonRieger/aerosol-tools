@@ -6,7 +6,9 @@ import xarray as xr
 from aerosol_tools.filters import truncate_below_tropopause
 
 
-def calculate_aod_cdf_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
+def calculate_aod_cdf_tropopause(
+    data: xr.Dataset, max_alt_km: float = 35.0, km_above: float = 0.0
+):
     r"""
     Aerosol optical depth (AOD) computed using the mean extinction profile weighted by the
     probability that the altitude is in the stratosphere. This helps avoid the issue of
@@ -37,13 +39,15 @@ def calculate_aod_cdf_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
         Must have `extinction`, `tropopause_altitude` and `altitude` fields.
     max_alt_km : float
         Maximum altitude in km to use in calculation.
+    km_above : float
+        Shift tropopause up by `km_above`.
 
     Returns
     -------
     xr.Dataset
     """
 
-    data = truncate_below_tropopause(data, fill_value=0.0)
+    data = truncate_below_tropopause(data, km_above=km_above, fill_value=0.0)
     mean_extinction = data.extinction.mean(dim="time").sel(
         altitude=slice(0, max_alt_km)
     )
@@ -51,7 +55,9 @@ def calculate_aod_cdf_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
     return aod.rename("AOD").to_dataset()
 
 
-def calculate_aod_mean_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
+def calculate_aod_mean_tropopause(
+    data: xr.Dataset, max_alt_km: float = 35.0, km_above: float = 0.0
+):
     """
     Use the mean extinction profile truncated at the mean tropopause to
     compute the AOD.
@@ -63,6 +69,8 @@ def calculate_aod_mean_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
         Must have `extinction` and `tropopause_altitude` fields.
     max_alt_km : float
         Maximum altitude in km to use in calculation.
+    km_above : float
+        Shift tropopause up by `km_above`.
 
     Returns
     -------
@@ -70,7 +78,7 @@ def calculate_aod_mean_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
     """
 
     mean_trop = data.tropopause_altitude.mean(dim="time")
-    data["extinction"] = data.extinction.where(data.altitude > mean_trop)
+    data["extinction"] = data.extinction.where(data.altitude > mean_trop + km_above)
     mean_extinction = data.extinction.mean(dim="time").sel(
         altitude=slice(0, max_alt_km)
     )
@@ -78,7 +86,9 @@ def calculate_aod_mean_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
     return aod.rename("AOD").to_dataset()
 
 
-def calculate_aod_local_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
+def calculate_aod_local_tropopause(
+    data: xr.Dataset, max_alt_km: float = 35.0, km_above: float = 0.0
+):
     """
     Use the mean extinction profile truncated at the local tropopause to
     compute the AOD.
@@ -90,13 +100,15 @@ def calculate_aod_local_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
         Must have `extinction` and `tropopause_altitude` fields.
     max_alt_km : float
         Maximum altitude in km to use in calculation.
+    km_above : float
+        Shift tropopause up by `km_above`.
 
     Returns
     -------
     xr.Dataset
     """
 
-    data = truncate_below_tropopause(data, fill_value=np.nan)
+    data = truncate_below_tropopause(data, km_above=km_above, fill_value=np.nan)
     mean_extinction = data.extinction.mean(dim="time").sel(
         altitude=slice(0, max_alt_km)
     )
@@ -104,7 +116,9 @@ def calculate_aod_local_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
     return aod.rename("AOD").to_dataset()
 
 
-def calculate_aod_per_profile(data: xr.Dataset, max_alt_km: float = 35.0):
+def calculate_aod_per_profile(
+    data: xr.Dataset, max_alt_km: float = 35.0, km_above: float = 0.0
+):
     """
     Use each extinction profile to compute the AOD and then average. This is equivalent to
     `calculate_aod_cdf_tropopause` if all profiles extend to the tropopause but will tend to
@@ -118,13 +132,15 @@ def calculate_aod_per_profile(data: xr.Dataset, max_alt_km: float = 35.0):
         Must have `extinction` and `tropopause_altitude` fields.
     max_alt_km : float
         Maximum altitude in km to use in calculation.
+    km_above : float
+        Shift tropopause up by `km_above`.
 
     Returns
     -------
     xr.Dataset
     """
 
-    data = truncate_below_tropopause(data, fill_value=np.nan)
+    data = truncate_below_tropopause(data, km_above=km_above, fill_value=np.nan)
     aod = (
         data.extinction.sel(altitude=slice(0, max_alt_km))
         .fillna(0.0)

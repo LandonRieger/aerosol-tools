@@ -10,8 +10,8 @@ import xarray as xr
 
 def load_omps_usask(
     data_dir: str | Path,
-    min_time: str | np.datetime64 | None = None,
-    max_time: str | np.datetime64 | None = None,
+    start_date: str | np.datetime64 | None = None,
+    end_date: str | np.datetime64 | None = None,
 ):
     """
 
@@ -19,9 +19,9 @@ def load_omps_usask(
     ----------
     data_dir : Path | str
         Path to monthly Usask v1.3 files
-    min_time : str | np.datetime64 | None
+    start_date : str | np.datetime64 | None
         first time to load. Default `None` will load all available data.
-    max_time : str | np.datetime64 | None
+    end_date : str | np.datetime64 | None
         last time to load. Default `None` will load all available data.
 
     Returns
@@ -33,10 +33,10 @@ def load_omps_usask(
         data_dir = Path(data_dir)
 
     data = []
-    if isinstance(min_time, str):
-        min_time = np.datetime64(min_time)
-    if isinstance(max_time, str):
-        max_time = np.datetime64(max_time)
+    if isinstance(start_date, str):
+        start_date = np.datetime64(start_date)
+    if isinstance(end_date, str):
+        end_date = np.datetime64(end_date)
 
     for file in data_dir.glob("*.nc"):
 
@@ -47,9 +47,9 @@ def load_omps_usask(
         )
         file_start = np.datetime64(f"{ftime[0:4]}-{ftime[4:6]}-01 00:00:00")
 
-        if min_time and file_end < min_time:
+        if start_date and file_end < start_date:
             continue
-        if max_time and file_start > max_time:
+        if end_date and file_start > end_date:
             continue
 
         try:
@@ -78,8 +78,8 @@ def load_omps_usask(
             "orbit",
         ]
     ]
-    if min_time is not None:
-        omps = omps.sel(time=slice(min_time, max_time))
+    if start_date is not None:
+        omps = omps.sel(time=slice(start_date, end_date))
 
     omps["extinction"] = omps["extinction"].where(omps.extinction_error > 0)
     omps["extinction"] = omps["extinction"].where(
@@ -91,8 +91,8 @@ def load_omps_usask(
 
 def load_omps_iup(
     data_dir: str | Path,
-    min_time: str | np.datetime64 | None = None,
-    max_time: str | np.datetime64 | None = None,
+    start_date: str | np.datetime64 | None = None,
+    end_date: str | np.datetime64 | None = None,
 ):
     """
 
@@ -100,9 +100,9 @@ def load_omps_iup(
     ----------
     data_dir : Path | str
         Path to yearly v2.1 IUP files
-    min_time : str | np.datetime64 | None
+    start_date : str | np.datetime64 | None
         first time to load. Default `None` will load all available data.
-    max_time : str | np.datetime64 | None
+    end_date : str | np.datetime64 | None
         last time to load. Default `None` will load all available data.
 
     Returns
@@ -113,7 +113,7 @@ def load_omps_iup(
     if isinstance(data_dir, str):
         data_dir = Path(data_dir)
 
-    years = np.unique([d.year for d in pd.date_range(min_time, max_time, freq="D")])
+    years = np.unique([d.year for d in pd.date_range(start_date, end_date, freq="D")])
     data = []
     for year in years:
         try:
@@ -180,7 +180,7 @@ def load_omps_iup(
     # filter out duplicate times
     data = (
         xr.concat(data, dim="time")
-        .sel(time=slice(min_time, max_time))
+        .sel(time=slice(start_date, end_date))
         .sortby("altitude")
     )
     _, idx = np.unique(data.time.values, return_index=True)
@@ -189,8 +189,8 @@ def load_omps_iup(
 
 def load_omps_nasa(
     data_dir: str | Path,
-    min_time: str | np.datetime64 | None = None,
-    max_time: str | np.datetime64 | None = None,
+    start_date: str | np.datetime64 | None = None,
+    end_date: str | np.datetime64 | None = None,
     wavelength: float | None = None,
     crosstrack: int | None = None,
 ):
@@ -200,9 +200,9 @@ def load_omps_nasa(
     ----------
     data_dir : str | Path
         Location of OMPS yearly files created from `aerosol_tools.dataloader.create_omps_yearly_files`
-    min_time : str | np.datetime64 | None
+    start_date : str | np.datetime64 | None
         first time to load. Default `None` will load all available data.
-    max_time : str | np.datetime64 | None
+    end_date : str | np.datetime64 | None
         last time to load. Default `None` will load all available data.
     wavelength : float
         select only a certain wavelength.
@@ -230,8 +230,8 @@ def load_omps_nasa(
 
     ds = xr.open_mfdataset(str(data_dir / "*.nc"), preprocess=subselect)
 
-    if min_time is not None and max_time is not None:
-        ds = ds.sel(time=slice(min_time, max_time))
+    if start_date is not None and end_date is not None:
+        ds = ds.sel(time=slice(start_date, end_date))
 
     return ds.rename(
         {"RetrievedExtCoeff": "extinction", "TropopauseAltitude": "tropopause_altitude"}
