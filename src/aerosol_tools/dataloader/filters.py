@@ -1,5 +1,7 @@
-import xarray as xr
+from __future__ import annotations
+
 import numpy as np
+import xarray as xr
 
 
 def truncate_below_max_value(data: xr.Dataset, filter_val: float):
@@ -18,15 +20,17 @@ def truncate_below_max_value(data: xr.Dataset, filter_val: float):
     xr.Dataset
     """
 
-    min_alt = ((data.extinction >= filter_val) * data.altitude)
-    min_alt = min_alt.where(min_alt > 0).max(dim='altitude') + 0.1
+    min_alt = (data.extinction >= filter_val) * data.altitude
+    min_alt = min_alt.where(min_alt > 0).max(dim="altitude") + 0.1
     min_alt = min_alt.fillna(0.0)
-    data['extinction'] = data.extinction.where(data.altitude > min_alt)
+    data["extinction"] = data.extinction.where(data.altitude > min_alt)
 
     return data
 
 
-def truncate_below_tropopause(data: xr.Dataset, km_above: float = 0.0, fill_value: float | None = None):
+def truncate_below_tropopause(
+    data: xr.Dataset, km_above: float = 0.0, fill_value: float | None = None
+):
     """
     Filter all points below the tropopause and replace with `fill_value`
 
@@ -47,6 +51,7 @@ def truncate_below_tropopause(data: xr.Dataset, km_above: float = 0.0, fill_valu
     if fill_value is None:
         fill_value = np.nan
 
-    data['extinction'] = data.extinction.where(data.altiude > data.tropopause_altitude + km_above,
-                                               fill_value=fill_value)
+    data["extinction"] = data.extinction.where(
+        data.altitude > data.tropopause_altitude + km_above, other=fill_value
+    )
     return data

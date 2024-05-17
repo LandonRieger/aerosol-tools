@@ -7,60 +7,59 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 from __future__ import annotations
 
-project = 'aerosol_tools'
-copyright = '2024, USask-ARG'
-author = 'USask-ARG'
-github_url = ''
+project = "aerosol_tools"
+copyright = "2024, USask-ARG"
+author = "USask-ARG"
+github_url = ""
 
 from importlib.metadata import version as get_version
 
 release: str = get_version(project)
 # for example take major/minor
-version: str = ".".join(release.split('.')[:2])
+version: str = ".".join(release.split(".")[:2])
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.napoleon',
-    'myst_nb',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
+    "myst_nb",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
-    #"sphinx_copybutton",
+    # "sphinx_copybutton",
     "sphinx_design",
-    #"sphinx_examples",
-    #"sphinx_tabs.tabs",
-    #"sphinx_thebe",
-    #"sphinx_togglebutton",
-    #"sphinxcontrib.bibtex",
-    #"sphinxext.opengraph",
+    # "sphinx_examples",
+    # "sphinx_tabs.tabs",
+    # "sphinx_thebe",
+    # "sphinx_togglebutton",
+    # "sphinxcontrib.bibtex",
+    # "sphinxext.opengraph",
     # For the kitchen sink
     "sphinx.ext.todo",
 ]
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
 
 autodoc_docstring_signature = True
 autodoc_default_options = {
-    'members': True,
-    'show-inheritance': True,
-    'member_order': 'groupwise'
+    "members": True,
+    "show-inheritance": True,
+    "member_order": "groupwise",
 }
-autoclass_content = 'both'
-
+autoclass_content = "both"
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_book_theme"
-html_static_path = ['_static']
+html_static_path = ["_static"]
 html_css_files = ["locals.css"]
 
 html_theme_options = {
@@ -98,6 +97,6 @@ intersphinx_mapping = {
     "dask": ("https://docs.dask.org/en/latest", None),
     "sparse": ("https://sparse.pydata.org/en/latest/", None),
     "xarray-tutorial": ("https://tutorial.xarray.dev/", None),
-    "xarray": ("https://docs.xarray.dev/en/stable/", None)
+    "xarray": ("https://docs.xarray.dev/en/stable/", None),
     # "opt_einsum": ("https://dgasmith.github.io/opt_einsum/", None),
 }

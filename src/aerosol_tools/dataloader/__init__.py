@@ -1,2 +1,12 @@
-from aerosol_tools.dataloader.omps import load_omps_usask, load_omps_iup, load_omps_nasa, create_omps_yearly_files
-from aerosol_tools.dataloader.filters import truncate_below_max_value, truncate_below_tropopause
+from __future__ import annotations
+
+from aerosol_tools.dataloader.filters import (
+    truncate_below_max_value,
+    truncate_below_tropopause,
+)
+from aerosol_tools.dataloader.omps import (
+    create_omps_yearly_files,
+    load_omps_iup,
+    load_omps_nasa,
+    load_omps_usask,
+)

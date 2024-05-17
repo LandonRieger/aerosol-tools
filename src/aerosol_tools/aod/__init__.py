@@ -1,9 +1,12 @@
-import xarray as xr
+from __future__ import annotations
+
 import numpy as np
+import xarray as xr
+
 from aerosol_tools import truncate_below_tropopause
 
 
-def calculate_aod_cdf_tropopause(data: xr.Dataset, max_alt_km: float):
+def calculate_aod_cdf_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
     """
 
     Parameters
@@ -20,12 +23,12 @@ def calculate_aod_cdf_tropopause(data: xr.Dataset, max_alt_km: float):
     """
 
     data = truncate_below_tropopause(data, fill_value=0.0)
-    mean_extinction = data.extinction.mean(dim='time')
-    aod = mean_extinction.sel(altitude=slice(0, max_alt_km)).sum(dim='altitude')
-    return aod.to_dataset().rename({'aod': 'AOD'})
+    mean_extinction = data.extinction.mean(dim="time")
+    aod = mean_extinction.sel(altitude=slice(0, max_alt_km)).sum(dim="altitude")
+    return aod.rename("AOD").to_dataset()
 
 
-def calculate_aod_average_tropopause(data: xr.Dataset, max_alt_km: float):
+def calculate_aod_average_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
     """
 
     Parameters
@@ -41,14 +44,14 @@ def calculate_aod_average_tropopause(data: xr.Dataset, max_alt_km: float):
     xr.Dataset
     """
 
-    mean_trop = data.tropopause_altitude.mean(dim='time')
-    data = data.extinction.where(data.altitude > mean_trop)
-    mean_extinction = data.extinction.mean(dim='time')
-    aod = mean_extinction.sel(altitude=slice(0, max_alt_km)).sum(dim='altitude')
-    return aod.to_dataset().rename({'aod': 'AOD'})
+    mean_trop = data.tropopause_altitude.mean(dim="time")
+    data["extinction"] = data.extinction.where(data.altitude > mean_trop)
+    mean_extinction = data.extinction.mean(dim="time")
+    aod = mean_extinction.sel(altitude=slice(0, max_alt_km)).sum(dim="altitude")
+    return aod.rename("AOD").to_dataset()
 
 
-def calculate_aod_local_tropopause(data: xr.Dataset, max_alt_km: float):
+def calculate_aod_local_tropopause(data: xr.Dataset, max_alt_km: float = 35.0):
     """
 
     Parameters
@@ -65,12 +68,12 @@ def calculate_aod_local_tropopause(data: xr.Dataset, max_alt_km: float):
     """
 
     data = truncate_below_tropopause(data, fill_value=np.nan)
-    mean_extinction = data.extinction.mean(dim='time')
-    aod = mean_extinction.sel(altitude=slice(0, max_alt_km)).sum(dim='altitude')
-    return aod.to_dataset().rename({'aod': 'AOD'})
+    mean_extinction = data.extinction.mean(dim="time")
+    aod = mean_extinction.sel(altitude=slice(0, max_alt_km)).sum(dim="altitude")
+    return aod.rename("AOD").to_dataset()
 
 
-def calculate_aod_per_profile(data: xr.Dataset, max_alt_km: float):
+def calculate_aod_per_profile(data: xr.Dataset, max_alt_km: float = 35.0):
     """
 
     Parameters
@@ -86,5 +89,10 @@ def calculate_aod_per_profile(data: xr.Dataset, max_alt_km: float):
     xr.Dataset
     """
 
-    aod = data.extinction.sel(altitude=slice(0, max_alt_km)).sum(dim='altitude').mean(dim='time')
-    return aod.to_dataset().rename({'aod': 'AOD'})
+    data = truncate_below_tropopause(data, fill_value=np.nan)
+    aod = (
+        data.extinction.sel(altitude=slice(0, max_alt_km))
+        .sum(dim="altitude")
+        .mean(dim="time")
+    )
+    return aod.rename("AOD").to_dataset()
