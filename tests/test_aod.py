@@ -12,9 +12,6 @@ from aerosol_tools import (
     calculate_aod_per_profile,
 )
 
-AOD_PRECISION = 0.0000001
-
-
 """
 Test AOD calculation
 
@@ -23,7 +20,12 @@ Test AOD calculation
  - Highest altitude of 34.5km.
  - Two profiles have retrievals that truncate above the tropopause simulating saturation.
  - Theoretically correct AOD is 21.75
+ - All methods will slightly underestimate as the profile is not extrapolated from the
+   lowest point to the tropopause.
 """
+
+
+AOD_PRECISION = 0.0000001
 
 
 @pytest.fixture()
