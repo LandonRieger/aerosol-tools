@@ -15,6 +15,17 @@ from aerosol_tools import (
 AOD_PRECISION = 0.0000001
 
 
+"""
+Test AOD calculation
+
+ - 10 profiles with tropopause linearly increasing from 10.5 to 15km.
+ - Extinction is 1.0 at all points.
+ - Highest altitude of 34.5km.
+ - Two profiles have retrievals that truncate above the tropopause simulating saturation.
+ - Theoretically correct AOD is 21.75
+"""
+
+
 @pytest.fixture()
 def omps_data():
 

@@ -23,7 +23,7 @@ omps.extinction.where((omps.latitude < 10) &
                       (omps.latitude > -10))\
                .resample(time='1MS')\
                .mean()\
-               .plot(size=5, x='time')
+               .plot(x='time')
 ```
 
 ### Computing Aerosol Optical Depth
