@@ -5,14 +5,14 @@ from pathlib import Path
 import pytest
 
 from aerosol_tools import (
-    calculate_aod_average_tropopause,
     calculate_aod_cdf_tropopause,
     calculate_aod_local_tropopause,
+    calculate_aod_mean_tropopause,
     calculate_aod_per_profile,
     load_omps_usask,
 )
 
-AOD_PRECISION = 0.000001
+AOD_PRECISION = 0.0000001
 
 
 @pytest.fixture()
@@ -27,19 +27,19 @@ def omps_data():
 
 def test_aod_cdf(omps_data):
     aod = calculate_aod_cdf_tropopause(omps_data)
-    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.006167515
+    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.0061631862
 
 
 def test_aod_mean_trop(omps_data):
-    aod = calculate_aod_average_tropopause(omps_data)
-    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.0061220907
+    aod = calculate_aod_mean_tropopause(omps_data)
+    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.0056597978
 
 
 def test_aod_local_trop(omps_data):
     aod = calculate_aod_local_tropopause(omps_data)
-    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.0082661135
+    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.0079408503
 
 
 def test_aod_per_profile(omps_data):
     aod = calculate_aod_per_profile(omps_data)
-    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.006167515
+    assert pytest.approx(float(aod.AOD.to_numpy()), AOD_PRECISION) == 0.0061631862
