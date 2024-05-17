@@ -3,13 +3,13 @@ requires = ["setuptools>64", "wheel", "setuptools-scm>=8.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "usask_arg_example"
+name = "aerosol_tools"
 dynamic = ["version"]
 description="usask arg example project"
 readme = "README.md"
-dependencies = ['numpy']
+dependencies = ['numpy', 'xarray', 'dask', 'pandas', 'netcdf4']
 authors = [
-    { name = "AUTHOR", email = "AUTHOR@EXAMPLE.com" },
+    { name = "Landon Rieger", email = "landon.rieger@usask.ca" },
 ]
 requires-python = ">=3.10"
 classifiers = [

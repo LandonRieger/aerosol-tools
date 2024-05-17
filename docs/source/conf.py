@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 from __future__ import annotations
 
-project = 'usask_arg_example'
+project = 'aerosol_tools'
 copyright = '2024, USask-ARG'
 author = 'USask-ARG'
 github_url = ''
